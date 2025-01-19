@@ -40,8 +40,8 @@ Program terdiri dari beberapa class
 
 # Classes
 <h4>Bases Model</h4>
-```
-package classes;
+
+```package classes;
 
 import java.sql.*;
 import java.util.List;
