@@ -1,9 +1,9 @@
 # UAS-OOP
-NamaA  : kbar Rizky Ramadhan
+Nama: kbar Rizky Ramadhan
 
-NIM    : 31231696
+NIM: 31231696
 
-Kelas  : TI.23.A6
+Kelas: TI.23.A6
 
 Mata Kuliah: Pemograman Berorientasi Objek
 
@@ -503,3 +503,494 @@ public class NilaiController {
 }
 ```
 
+# Model
+
+<h4>Mahasiswa</h4>
+
+```package model; 
+ 
+public class Mahasiswa { 
+    private int id; 
+    private String nim; 
+    private String nama; 
+    private String jurusan; 
+    private int angkatan; 
+ 
+    public Mahasiswa() { 
+        super(); 
+    } 
+ 
+    public Mahasiswa(int id, String nim, String nama, String jurusan, int 
+angkatan) { 
+        this.id = id; 
+        this.nim = nim; 
+        this.nama = nama; 
+        this.jurusan = jurusan; 
+        this.angkatan = angkatan; 
+    } 
+ 
+    // getter and setter 
+ 
+    public int getId() { 
+        return id; 
+    } 
+ 
+    public void setId(int id) { 
+        this.id = id; 
+    } 
+ 
+    public String getNim() { 
+        return nim; 
+    } 
+ 
+    public void setNim(String nim) { 
+        this.nim = nim; 
+    } 
+ 
+    public String getNama() { 
+        return nama; 
+    } 
+ 
+    public void setNama(String nama) { 
+        this.nama = nama; 
+    } 
+ 
+    public String getJurusan() { 
+        return jurusan; 
+    } 
+ 
+    public void setJurusan(String jurusan) { 
+        this.jurusan = jurusan; 
+    } 
+ 
+    public int getAngkatan() { 
+        return angkatan; 
+    } 
+ 
+    public void setAngkatan(int angkatan) { 
+        this.angkatan = angkatan; 
+    } 
+}
+```
+
+<h4>Mahasiswa Model</h4>
+
+```package model; 
+ 
+import classes.BaseModel; 
+import java.sql.ResultSet; 
+import java.sql.SQLException; 
+import java.util.Arrays; 
+ 
+public class MahasiswaModel extends BaseModel<Mahasiswa> { 
+    public MahasiswaModel() { 
+        super("mahasiswa", Arrays.asList("id", "nim", "nama", "jurusan", "angkatan")); 
+    } 
+ 
+    @Override 
+    protected boolean isNewRecord(Mahasiswa mahasiswa) { 
+        return mahasiswa.getId() == 0; 
+    } 
+ 
+    @Override 
+    protected Mahasiswa mapRow(ResultSet rs) throws SQLException { 
+        return new Mahasiswa( 
+                rs.getInt("id"), 
+                rs.getString("nim"), 
+                rs.getString("nama"), 
+                rs.getString("jurusan"), 
+                rs.getInt("angkatan") 
+        ); 
+    } 
+ 
+    @Override 
+    protected Object[] getValues(Mahasiswa mahasiswa, boolean includeId) { 
+        if (includeId) { 
+            return new Object[]{mahasiswa.getNim(), mahasiswa.getNama(), 
+mahasiswa.getJurusan(), mahasiswa.getAngkatan(), mahasiswa.getId()}; 
+        } else { 
+            return new Object[]{mahasiswa.getNim(), mahasiswa.getNama(), 
+mahasiswa.getJurusan(), mahasiswa.getAngkatan()}; 
+        } 
+    } 
+}
+```
+
+<h4>Nilai</h4>
+
+```package model;
+
+public class Nilai {
+    private int id;
+    private int mahasiswaId;
+    private String mataKuliah;
+    private int semester;
+    private double nilai;
+
+    // Konstruktor dengan parameter
+    public Nilai(int id, int mahasiswaId, String mataKuliah, int semester, double nilai) {
+        this.id = id;
+        this.mahasiswaId = mahasiswaId;
+        this.mataKuliah = mataKuliah;
+        this.semester = semester;
+        this.nilai = nilai;
+    }
+
+    // Konstruktor tanpa parameter (default constructor)
+    public Nilai() {}
+
+    // Getter dan Setter
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getMahasiswaId() {
+        return mahasiswaId;
+    }
+
+    public void setMahasiswaId(int mahasiswaId) {
+        this.mahasiswaId = mahasiswaId;
+    }
+
+    public String getMataKuliah() {
+        return mataKuliah;
+    }
+
+    public void setMataKuliah(String mataKuliah) {
+        this.mataKuliah = mataKuliah;
+    }
+
+    public int getSemester() {
+        return semester;
+    }
+
+    public void setSemester(int semester) {
+        this.semester = semester;
+    }
+
+    public double getNilai() {
+        return nilai;
+    }
+
+    public void setNilai(double nilai) {
+        this.nilai = nilai;
+    }
+}
+```
+
+<h4>Nilai Model</h4>
+
+```package model;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import classes.Database;  // Pastikan mengimpor kelas Database
+
+public class NilaiModel {
+    private Connection connection;
+
+    // Konstruktor untuk menggunakan koneksi dari kelas Database
+    public NilaiModel() {
+        Database db = new Database(); // Membuat objek Database untuk mendapatkan koneksi
+        this.connection = db.getConn(); // Mendapatkan koneksi dari Database
+    }
+
+    public List<Nilai> findByMahasiswaId(int mahasiswaId) {
+        List<Nilai> nilaiList = new ArrayList<>();
+        String query = "SELECT * FROM nilai WHERE mahasiswa_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, mahasiswaId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Nilai nilai = new Nilai(
+                        resultSet.getInt("id"),
+                        resultSet.getInt("mahasiswa_id"),
+                        resultSet.getString("mata_kuliah"),
+                        resultSet.getInt("semester"),
+                        resultSet.getDouble("nilai")
+                    );
+                    nilaiList.add(nilai);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return nilaiList;
+    }
+
+    public boolean createNilai(Nilai nilai) {
+        String query = "INSERT INTO nilai (mahasiswa_id, mata_kuliah, semester, nilai) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, nilai.getMahasiswaId());
+            statement.setString(2, nilai.getMataKuliah());
+            statement.setInt(3, nilai.getSemester());
+            statement.setDouble(4, nilai.getNilai());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateNilai(Nilai nilai) {
+        String query = "UPDATE nilai SET mata_kuliah = ?, semester = ?, nilai = ? WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, nilai.getMataKuliah());
+            statement.setInt(2, nilai.getSemester());
+            statement.setDouble(3, nilai.getNilai());
+            statement.setInt(4, nilai.getId());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteNilai(int id) {
+        String query = "DELETE FROM nilai WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}
+```
+
+# View
+
+<h4>Form Input Nilai</h4>
+
+```package view;
+
+import model.Nilai;
+import model.NilaiModel;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class FormInputNilai extends JFrame {
+    private JPanel formPanel, buttonPanel;
+    private JTextField txtMahasiswaId, txtNamaMahasiswa, txtMataKuliah, txtSemester, txtNilai;
+    private JButton btnSave, btnCancel;
+    private final NilaiModel nilaiModel;
+    private Integer nilaiId;
+
+    public FormInputNilai(NilaiModel nilaiModel) {
+        this.nilaiModel = nilaiModel;
+
+        setTitle("Form Input Nilai Mahasiswa");
+        setSize(600, 400);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        // Panel Form dengan Titled Border
+        formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+        formPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLUE, 2), "Form Input"));
+        formPanel.setBackground(new Color(230, 240, 255));
+
+        // Label dan Input
+        JLabel lblMahasiswaId = new JLabel("Mahasiswa ID:");
+        lblMahasiswaId.setForeground(Color.BLUE);
+        txtMahasiswaId = new JTextField();
+        txtMahasiswaId.setEditable(false);
+
+        JLabel lblNama = new JLabel("Nama Mahasiswa:");
+        lblNama.setForeground(Color.BLUE);
+        txtNamaMahasiswa = new JTextField();
+        txtNamaMahasiswa.setEditable(false);
+
+        JLabel lblMataKuliah = new JLabel("Mata Kuliah:");
+        lblMataKuliah.setForeground(Color.BLUE);
+        txtMataKuliah = new JTextField();
+
+        JLabel lblSemester = new JLabel("Semester:");
+        lblSemester.setForeground(Color.BLUE);
+        txtSemester = new JTextField();
+
+        JLabel lblNilai = new JLabel("Nilai:");
+        lblNilai.setForeground(Color.BLUE);
+        txtNilai = new JTextField();
+
+        formPanel.add(lblMahasiswaId);
+        formPanel.add(txtMahasiswaId);
+        formPanel.add(lblNama);
+        formPanel.add(txtNamaMahasiswa);
+        formPanel.add(lblMataKuliah);
+        formPanel.add(txtMataKuliah);
+        formPanel.add(lblSemester);
+        formPanel.add(txtSemester);
+        formPanel.add(lblNilai);
+        formPanel.add(txtNilai);
+
+        // Panel Tombol dengan Desain Menarik
+        buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        btnSave = new JButton("Simpan Nilai");
+        btnSave.setBackground(Color.GREEN);
+        btnSave.setForeground(Color.WHITE);
+        btnSave.addActionListener(e -> saveNilai());
+
+        btnCancel = new JButton("Batal");
+        btnCancel.setBackground(Color.RED);
+        btnCancel.setForeground(Color.WHITE);
+        btnCancel.addActionListener(e -> dispose());
+
+        buttonPanel.add(btnSave);
+        buttonPanel.add(btnCancel);
+
+        setLayout(new BorderLayout(10, 10));
+        add(formPanel, BorderLayout.NORTH);
+        add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private void saveNilai() {
+        try {
+            String mahasiswaIdText = txtMahasiswaId.getText();
+            if (mahasiswaIdText.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Mahasiswa ID tidak boleh kosong.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int mahasiswaId = Integer.parseInt(mahasiswaIdText);
+
+            String mataKuliah = txtMataKuliah.getText();
+            if (mataKuliah.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Mata Kuliah tidak boleh kosong.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int semester = Integer.parseInt(txtSemester.getText());
+            double nilai = Double.parseDouble(txtNilai.getText());
+
+            if (nilaiId == null) {
+                nilaiModel.createNilai(new Nilai(0, mahasiswaId, mataKuliah, semester, nilai));
+            } else {
+                nilaiModel.updateNilai(new Nilai(nilaiId, mahasiswaId, mataKuliah, semester, nilai));
+            }
+            JOptionPane.showMessageDialog(this, "Nilai berhasil disimpan.");
+            dispose();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Input tidak valid.", "Kesalahan", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void setIdNilai(Integer nilaiId) {
+        this.nilaiId = nilaiId;
+    }
+
+    public void setMahasiswaId(String mahasiswaId) {
+        txtMahasiswaId.setText(mahasiswaId);
+    }
+
+    public void setMahasiswaNama(String nama) {
+        txtNamaMahasiswa.setText(nama);
+    }
+
+    public void setMataKuliah(String mataKuliah) {
+        txtMataKuliah.setText(mataKuliah);
+    }
+
+    public void setSemester(String semester) {
+        txtSemester.setText(semester);
+    }
+
+    public void setNilai(String nilai) {
+        txtNilai.setText(nilai);
+    }
+}
+```
+
+<h4>Form Mahasiswa</h4>
+
+```package view;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+
+public class FormMahasiswa extends JFrame {
+    private JPanel formPanel, buttonPanel;
+    public JTextField txtNim, txtNama, txtJurusan, txtAngkatan;
+    public JButton btnSave, btnUpdate, btnDelete, btnViewNilai;
+    public JTable tblMahasiswa;
+
+    public FormMahasiswa() {
+        setTitle("Form Data Mahasiswa");
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Menjadikan full window saat dijalankan
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        // Panel Form
+        formPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        formPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLUE, 2), "Form Input"));
+        formPanel.setBackground(new Color(230, 240, 255));
+
+        JLabel lblNim = new JLabel("NIM:");
+        lblNim.setForeground(Color.BLUE);
+        txtNim = new JTextField();
+
+        JLabel lblNama = new JLabel("Nama:");
+        lblNama.setForeground(Color.BLUE);
+        txtNama = new JTextField();
+
+        JLabel lblJurusan = new JLabel("Jurusan:");
+        lblJurusan.setForeground(Color.BLUE);
+        txtJurusan = new JTextField();
+
+        JLabel lblAngkatan = new JLabel("Angkatan:");
+        lblAngkatan.setForeground(Color.BLUE);
+        txtAngkatan = new JTextField();
+
+        formPanel.add(lblNim);
+        formPanel.add(txtNim);
+        formPanel.add(lblNama);
+        formPanel.add(txtNama);
+        formPanel.add(lblJurusan);
+        formPanel.add(txtJurusan);
+        formPanel.add(lblAngkatan);
+        formPanel.add(txtAngkatan);
+
+        // Panel Tombol
+        buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        btnSave = new JButton("Simpan");
+        btnSave.setBackground(Color.GREEN);
+        btnSave.setForeground(Color.WHITE);
+
+        btnUpdate = new JButton("Perbarui");
+        btnUpdate.setBackground(Color.ORANGE);
+        btnUpdate.setForeground(Color.WHITE);
+
+        btnDelete = new JButton("Hapus");
+        btnDelete.setBackground(Color.RED);
+        btnDelete.setForeground(Color.WHITE);
+
+        btnViewNilai = new JButton("Nilai");
+        btnViewNilai.setBackground(Color.CYAN);
+        btnViewNilai.setForeground(Color.BLACK);
+
+        buttonPanel.add(btnSave);
+        buttonPanel.add(btnUpdate);
+        buttonPanel.add(btnDelete);
+        buttonPanel.add(btnViewNilai);
+
+        // Tabel Mahasiswa
+        tblMahasiswa = new JTable();
+        tblMahasiswa.setGridColor(Color.GRAY);
+        tblMahasiswa.setSelectionBackground(new Color(200, 230, 201));
+        DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "NIM", "Nama", "Jurusan", "Angkatan"}, 0);
+        tblMahasiswa.setModel(model);
+
+        // Layout
+        setLayout(new BorderLayout(10, 10));
+        add(formPanel, BorderLayout.NORTH);
+        add(new JScrollPane(tblMahasiswa), BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+    }
+}
+```
