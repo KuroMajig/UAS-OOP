@@ -24,3 +24,12 @@ Proyek ini dibuat untuk memenuhi tugas akhir mata kuliah **Pemrograman Berorient
 
 # Form Input Nilai
 ![Screenshot 2025-01-19 195003](https://github.com/user-attachments/assets/7edb5695-c4ce-4a77-a9f6-c7a9a41b291b)
+
+# Resource
+
+<h4>Condfig.properties</h4>
+config untuk menyambungkan databases yang telah dibuat di MySql.
+
+db.url=jdbc:mysql://localhost:3306/akademik
+db.user=root
+db.password=
