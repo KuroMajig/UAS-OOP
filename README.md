@@ -115,6 +115,7 @@ public abstract class BaseModel<T> {
 }
 ```
 <h4>Database</h4>
+
 ```package classes;
 
 import java.io.FileInputStream;
@@ -232,8 +233,10 @@ public class Database {
         }
     }
 }
+```
 
-<h4>Row Mapper</h4>
+<h4>Rowmapper</h4>
+
 ```package classes; 
  
 import java.sql.ResultSet; 
@@ -241,5 +244,5 @@ import java.sql.SQLException;
  
 public interface RowMapper<T> { 
     T mapRow(ResultSet rs) throws SQLException; 
-} 
-
+}
+```
