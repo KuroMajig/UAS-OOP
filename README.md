@@ -1,5 +1,5 @@
 # UAS-OOP
-Nama: kbar Rizky Ramadhan
+Nama: Akbar Rizky Ramadhan
 
 NIM: 31231696
 
