@@ -30,8 +30,8 @@ Proyek ini dibuat untuk memenuhi tugas akhir mata kuliah **Pemrograman Berorient
 <h4>Condfig.properties</h4>
 config untuk menyambungkan databases yang telah dibuat di MySql.
 
-'''java
-package classes;
+
+```package classes;
 
 import java.sql.*;
 import java.util.List;
