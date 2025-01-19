@@ -29,7 +29,7 @@ Proyek ini dibuat untuk memenuhi tugas akhir mata kuliah **Pemrograman Berorient
 
 <h4>Condfig.properties</h4>
 config untuk menyambungkan databases yang telah dibuat di MySql.
-
-```db.url=jdbc:mysql://localhost:3306/akademik
+```
+db.url=jdbc:mysql://localhost:3306/akademik
 db.user=root
 db.password=
